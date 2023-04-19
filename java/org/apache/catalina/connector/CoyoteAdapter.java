@@ -16,19 +16,6 @@
  */
 package org.apache.catalina.connector;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.EnumSet;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.servlet.ReadListener;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -53,6 +40,14 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.res.StringManager;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 
 /**
  * Implementation of a request processor which delegates the processing to a Coyote processor.
@@ -67,14 +62,14 @@ public class CoyoteAdapter implements Adapter {
     // -------------------------------------------------------------- Constants
 
     private static final String POWERED_BY = "Servlet/4.0 JSP/2.3 " + "(" + ServerInfo.getServerInfo() + " Java/" +
-            System.getProperty("java.vm.vendor") + "/" + System.getProperty("java.runtime.version") + ")";
+        System.getProperty("java.vm.vendor") + "/" + System.getProperty("java.runtime.version") + ")";
 
     private static final EnumSet<SessionTrackingMode> SSL_ONLY = EnumSet.of(SessionTrackingMode.SSL);
 
     public static final int ADAPTER_NOTES = 1;
 
     protected static final boolean ALLOW_BACKSLASH = Boolean
-            .parseBoolean(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
+        .parseBoolean(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
 
 
     // ----------------------------------------------------------- Constructors
@@ -111,7 +106,7 @@ public class CoyoteAdapter implements Adapter {
 
     @Override
     public boolean asyncDispatch(org.apache.coyote.Request req, org.apache.coyote.Response res, SocketEvent status)
-            throws Exception {
+        throws Exception {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
@@ -297,7 +292,13 @@ public class CoyoteAdapter implements Adapter {
         return success;
     }
 
-
+    /**
+     * 适配器 将apache中的Request转化为JDK的Request
+     *
+     * @param req The request object
+     * @param res The response object
+     * @throws Exception
+     */
     @Override
     public void service(org.apache.coyote.Request req, org.apache.coyote.Response res) throws Exception {
 
@@ -437,7 +438,7 @@ public class CoyoteAdapter implements Adapter {
 
     @Override
     public boolean prepare(org.apache.coyote.Request req, org.apache.coyote.Response res)
-            throws IOException, ServletException {
+        throws IOException, ServletException {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
@@ -548,15 +549,13 @@ public class CoyoteAdapter implements Adapter {
      * @param request  The catalina request object
      * @param res      The coyote response object
      * @param response The catalina response object
-     *
      * @return <code>true</code> if the request should be passed on to the start of the container pipeline, otherwise
-     *             <code>false</code>
-     *
+     * <code>false</code>
      * @throws IOException      If there is insufficient space in a buffer while processing headers
      * @throws ServletException If the supported methods of the target servlet cannot be determined
      */
     protected boolean postParseRequest(org.apache.coyote.Request req, Request request, org.apache.coyote.Response res,
-            Response response) throws IOException, ServletException {
+                                       Response response) throws IOException, ServletException {
 
         // If the processor has set the scheme (AJP does this, HTTP does this if
         // SSL is enabled) use this to set the secure flag as well. If the
@@ -627,7 +626,7 @@ public class CoyoteAdapter implements Adapter {
                 // %xx decoding of the URL
                 try {
                     req.getURLDecoder().convert(decodedURI.getByteChunk(),
-                            connector.getEncodedSolidusHandlingInternal());
+                        connector.getEncodedSolidusHandlingInternal());
                 } catch (IOException ioe) {
                     response.sendError(400, sm.getString("coyoteAdapter.invalidURIWithMessage", ioe.getMessage()));
                 }
@@ -795,7 +794,7 @@ public class CoyoteAdapter implements Adapter {
                 // This is not optimal, but as this is not very common, it
                 // shouldn't matter
                 redirectPath = redirectPath + ";" + SessionConfig.getSessionUriParamName(request.getContext()) + "=" +
-                        request.getRequestedSessionId();
+                    request.getRequestedSessionId();
             }
             if (query != null) {
                 // This is not optimal, but as this is not very common, it
@@ -914,7 +913,7 @@ public class CoyoteAdapter implements Adapter {
 
             int pathParamStart = semicolon + 1;
             int pathParamEnd = ByteChunk.findBytes(uriBC.getBuffer(), start + pathParamStart, end,
-                    new byte[] { ';', '/' });
+                new byte[]{';', '/'});
 
             String pv = null;
 
@@ -967,8 +966,8 @@ public class CoyoteAdapter implements Adapter {
      */
     protected void parseSessionSslId(Request request) {
         if (request.getRequestedSessionId() == null &&
-                SSL_ONLY.equals(request.getServletContext().getEffectiveSessionTrackingModes()) &&
-                request.connector.secure) {
+            SSL_ONLY.equals(request.getServletContext().getEffectiveSessionTrackingModes()) &&
+            request.connector.secure) {
             String sessionId = (String) request.getAttribute(SSLSupport.SESSION_ID_KEY);
             if (sessionId != null) {
                 request.setRequestedSessionId(sessionId);
@@ -991,7 +990,7 @@ public class CoyoteAdapter implements Adapter {
         // overwrite the valid session ID encoded in the URL
         Context context = request.getMappingData().context;
         if (context != null &&
-                !context.getServletContext().getEffectiveSessionTrackingModes().contains(SessionTrackingMode.COOKIE)) {
+            !context.getServletContext().getEffectiveSessionTrackingModes().contains(SessionTrackingMode.COOKIE)) {
             return;
         }
 
@@ -1035,7 +1034,6 @@ public class CoyoteAdapter implements Adapter {
      *
      * @param uri     MessageBytes object containing the URI
      * @param request The Servlet request object
-     *
      * @throws IOException if a IO exception occurs sending an error to the client
      */
     protected void convertURI(MessageBytes uri, Request request) throws IOException {
@@ -1099,9 +1097,8 @@ public class CoyoteAdapter implements Adapter {
      * This method normalizes "\", "//", "/./" and "/../".
      *
      * @param uriMB URI to be normalized
-     *
      * @return <code>false</code> if normalizing this URI would require going above the root, or if the URI contains a
-     *             null byte, otherwise <code>true</code>
+     * null byte, otherwise <code>true</code>
      */
     public static boolean normalize(MessageBytes uriMB) {
 
@@ -1207,10 +1204,8 @@ public class CoyoteAdapter implements Adapter {
      * "/../".
      *
      * @param uriMB URI to be checked (should be chars)
-     *
      * @return <code>false</code> if sequences that are supposed to be normalized are still present in the URI,
-     *             otherwise <code>true</code>
-     *
+     * otherwise <code>true</code>
      * @deprecated This code will be removed in Apache Tomcat 10 onwards
      */
     @Deprecated

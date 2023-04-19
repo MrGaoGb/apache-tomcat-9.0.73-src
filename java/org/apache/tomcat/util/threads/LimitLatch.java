@@ -114,6 +114,7 @@ public class LimitLatch {
         if (log.isDebugEnabled()) {
             log.debug("Counting up["+Thread.currentThread().getName()+"] latch="+getCount());
         }
+        // 使用AQS
         sync.acquireSharedInterruptibly(1);
     }
 

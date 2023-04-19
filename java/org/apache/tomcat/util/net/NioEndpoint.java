@@ -307,6 +307,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 createExecutor();
             }
 
+            // 初始化最大连接数锁
             initializeConnectionLatch();
 
             // Start poller thread

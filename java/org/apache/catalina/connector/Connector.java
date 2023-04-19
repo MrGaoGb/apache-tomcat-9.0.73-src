@@ -979,7 +979,7 @@ public class Connector extends LifecycleMBeanBase {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"));
         }
 
-        // Initialize adapter
+        // Initialize adapter 适配器
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
         if (service != null) {

@@ -158,6 +158,7 @@ public final class ApplicationFilterChain implements FilterChain {
             throws IOException, ServletException {
 
         // Call the next filter if there is one
+        // 循环遍历Filter过滤器
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
             try {
@@ -188,6 +189,7 @@ public final class ApplicationFilterChain implements FilterChain {
         }
 
         // We fell off the end of the chain -- call the servlet instance
+        // 此处开始分发处理真实请求
         try {
             if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(request);
