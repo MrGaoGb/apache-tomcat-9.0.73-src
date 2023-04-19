@@ -250,7 +250,7 @@ public final class Bootstrap {
      * @throws Exception Fatal initialization error
      */
     public void init() throws Exception {
-
+        // 创建ClassLoader对象
         initClassLoaders();
 
         Thread.currentThread().setContextClassLoader(catalinaLoader);
@@ -261,6 +261,10 @@ public final class Bootstrap {
         if (log.isDebugEnabled()) {
             log.debug("Loading startup class");
         }
+        /**
+         * 反射创建Catalina实例
+         * 设置Catalina parent类加载器 setParentClassLoader
+         */
         Class<?> startupClass = catalinaLoader.loadClass("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.getConstructor().newInstance();
 
@@ -459,6 +463,7 @@ public final class Bootstrap {
             }
         }
 
+        // 通过命令启动Tomcat start stop
         try {
             String command = "start";
             if (args.length > 0) {
@@ -474,7 +479,9 @@ public final class Bootstrap {
                 daemon.stop();
             } else if (command.equals("start")) {
                 daemon.setAwait(true);
+                // 执行Catalina的load方法
                 daemon.load(args);
+                // 执行Catalina的start方法
                 daemon.start();
                 if (null == daemon.getServer()) {
                     System.exit(1);

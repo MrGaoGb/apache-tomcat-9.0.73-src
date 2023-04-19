@@ -1051,6 +1051,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         super.initInternal();
 
         // We want logger as soon as possible
+        // StandardEngine
         if (container != null) {
             this.containerLog = container.getLogger();
         }

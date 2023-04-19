@@ -775,6 +775,7 @@ public class StandardHost extends ContainerBase implements Host {
         if ((errorValve != null) && (!errorValve.equals(""))) {
             try {
                 boolean found = false;
+                // Pipeline中包含了2个(StandardHostValve和AccessLogValve)
                 Valve[] valves = getPipeline().getValves();
                 for (Valve valve : valves) {
                     if (errorValve.equals(valve.getClass().getName())) {
@@ -785,6 +786,7 @@ public class StandardHost extends ContainerBase implements Host {
                 if (!found) {
                     Valve valve = ErrorReportValve.class.getName().equals(errorValve) ? new ErrorReportValve()
                             : (Valve) Class.forName(errorValve).getConstructor().newInstance();
+                    // 将ErrorReportValve添加到Pipeline中
                     getPipeline().addValve(valve);
                 }
             } catch (Throwable t) {

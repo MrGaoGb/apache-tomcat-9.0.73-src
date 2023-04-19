@@ -216,9 +216,11 @@ public class CombinedRealm extends RealmBase {
     @Override
     protected void startInternal() throws LifecycleException {
         // Start 'sub-realms' then this one
+        // UserDatabaseRealm
         Iterator<Realm> iter = realms.iterator();
 
         while (iter.hasNext()) {
+            // UserDatabaseRealm
             Realm realm = iter.next();
             if (realm instanceof Lifecycle) {
                 try {

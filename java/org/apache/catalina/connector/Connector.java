@@ -90,7 +90,8 @@ public class Connector extends LifecycleMBeanBase {
             log.error(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"), e);
         }
         if (p != null) {
-            protocolHandler = p;
+            protocolHandler = p; //Http11NioProtocol
+            // org.apache.coyote.http11.Http11NioProtocol
             protocolHandlerClassName = protocolHandler.getClass().getName();
         } else {
             protocolHandler = null;
@@ -975,7 +976,7 @@ public class Connector extends LifecycleMBeanBase {
 
         super.initInternal();
 
-        if (protocolHandler == null) {
+        if (protocolHandler == null) {//Http11NioProtocol
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"));
         }
 

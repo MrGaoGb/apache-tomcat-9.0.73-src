@@ -605,6 +605,7 @@ public class Catalina {
         } else {
             try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
                 // Create and execute our Digester
+                // 通过digester来解析 server.xml 文件
                 Digester digester = start ? createStartDigester() : createStopDigester();
                 InputStream inputStream = resource.getInputStream();
                 InputSource inputSource = new InputSource(resource.getURI().toURL().toString());
@@ -757,10 +758,12 @@ public class Catalina {
     public void start() {
 
         if (getServer() == null) {
+            // 若Server为空时 加载Catalina的load方法
             load();
         }
 
         if (getServer() == null) {
+            // 如果在执行load方法仍继续为空的话，则停止执行
             log.fatal(sm.getString("catalina.noServer"));
             return;
         }
@@ -769,7 +772,7 @@ public class Catalina {
 
         // Start the new server
         try {
-            getServer().start();
+            getServer().start();// 开始调用start方法
         } catch (LifecycleException e) {
             log.fatal(sm.getString("catalina.serverStartFail"), e);
             try {

@@ -914,6 +914,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Start our defined Services
         synchronized (servicesLock) {
             for (Service service : services) {
+                // 调用StandardService的start方法
                 service.start();
             }
         }
@@ -1115,6 +1116,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     @Override
     public ScheduledExecutorService getUtilityExecutor() {
-        return utilityExecutorWrapper;
+        return utilityExecutorWrapper;//ScheduledThreadPoolExecutor//
     }
 }

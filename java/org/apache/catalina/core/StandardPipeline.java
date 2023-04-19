@@ -72,6 +72,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
     public StandardPipeline(Container container) {
 
         super();
+        // StandardPipeline
         setContainer(container);
 
     }

@@ -228,11 +228,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     @Override
     public void bind() throws Exception {
+        // 初始化ServerSocket
         initServerSocket();
 
+        // 设置CountDownLatch
         setStopLatch(new CountDownLatch(1));
 
         // Initialize SSL if needed
+        // 默认不开启SSL 初始化SSL
         initialiseSsl();
     }
 
@@ -275,6 +278,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
             serverSock.bind(addr, getAcceptCount());
         }
+        // 默认配置ServerSock为阻塞模式
         serverSock.configureBlocking(true); //mimic APR behavior
     }
 

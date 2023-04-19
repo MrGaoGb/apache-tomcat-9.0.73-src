@@ -208,6 +208,7 @@ public class UserDatabaseRealm extends RealmBase {
      */
     private UserDatabase getUserDatabase() {
         // DCL so database MUST be volatile
+        // 使用单例模式DCL确保可见
         if (database == null) {
             synchronized (databaseLock) {
                 if (database == null) {

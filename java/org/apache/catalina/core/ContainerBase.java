@@ -219,7 +219,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     /**
      * The Realm with which this Container is associated.
      */
-    private volatile Realm realm = null;
+    private volatile Realm realm = null;//LockOutRealm
 
 
     /**
@@ -859,15 +859,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).start();
         }
+        // LockOutRealm
         Realm realm = getRealmInternal();
         if (realm instanceof Lifecycle) {
             ((Lifecycle) realm).start();
         }
 
         // Start our child containers, if any
+        // StandardHost ，父级 StandardEngine
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
+            // InlineExecutorService , StartChild 实现了Callable接口 相当于将StartChild线程提交到线程池中执行
+            // 即就是 执行 StandardHost的start方法
             results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
@@ -892,7 +896,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
         // Start the Valves in our pipeline (including the basic), if any
         if (pipeline instanceof Lifecycle) {
-            ((Lifecycle) pipeline).start();
+            ((Lifecycle) pipeline).start();// 调用StandardPipeline的start方法
         }
 
         setState(LifecycleState.STARTING);

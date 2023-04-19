@@ -82,7 +82,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
      * @param service The service this listener is associated with
      */
     public MapperListener(Service service) {
-        this.service = service;
+        this.service = service;// StandardService
         this.mapper = service.getMapper();
     }
 

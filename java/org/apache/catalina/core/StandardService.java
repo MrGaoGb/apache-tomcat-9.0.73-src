@@ -425,6 +425,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Start our defined Container first
         if (engine != null) {
             synchronized (engine) {
+                // 调用StandardEngine的start方法
                 engine.start();
             }
         }
@@ -529,7 +530,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         super.initInternal();
 
         if (engine != null) {
-            engine.init();
+            engine.init();// StandardEngine
         }
 
         // Initialize any Executors
