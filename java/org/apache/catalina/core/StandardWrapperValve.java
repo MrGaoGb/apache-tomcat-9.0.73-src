@@ -141,18 +141,20 @@ final class StandardWrapperValve extends ValveBase {
         // Create the filter chain for this request
         ApplicationFilterChain filterChain = ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
 
+        // TODO 执行此请求的过滤器链，与此同时也会执行servlet的service方法
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method
         Container container = this.container;
         try {
             if ((servlet != null) && (filterChain != null)) {
-                // Swallow output if needed
+                // Swallow output if needed(需要时吞下输出)
                 if (context.getSwallowOutput()) {
                     try {
                         SystemLogHandler.startCapture();
                         if (request.isAsyncDispatching()) {
                             request.getAsyncContextInternal().doInternalDispatch();
                         } else {
+                            //
                             filterChain.doFilter(request.getRequest(), response.getResponse());
                         }
                     } finally {
@@ -165,6 +167,7 @@ final class StandardWrapperValve extends ValveBase {
                     if (request.isAsyncDispatching()) {
                         request.getAsyncContextInternal().doInternalDispatch();
                     } else {
+                        // 此处为非异步 开始执行过滤器逻辑
                         filterChain.doFilter(request.getRequest(), response.getResponse());
                     }
                 }
@@ -204,14 +207,15 @@ final class StandardWrapperValve extends ValveBase {
             throwable = e;
             exception(request, response, e);
         } finally {
-            // Release the filter chain (if any) for this request
+            // Release the filter chain (if any) for this request(释放此请求的过滤器链)
             if (filterChain != null) {
                 filterChain.release();
             }
 
-            // Deallocate the allocated servlet instance
+            // Deallocate the allocated servlet instance(释放已分配的Servlet实例)
             try {
                 if (servlet != null) {
+                    // 释放已分配的Servlet实例
                     wrapper.deallocate(servlet);
                 }
             } catch (Throwable e) {
@@ -224,9 +228,10 @@ final class StandardWrapperValve extends ValveBase {
             }
 
             // If this servlet has been marked permanently unavailable,
-            // unload it and release this instance
+            // unload it and release this instance(如果这个servlet被标记为永久不可用，卸载它并释放这个实例)
             try {
                 if ((servlet != null) && (wrapper.getAvailable() == Long.MAX_VALUE)) {
+                    // 如果这个servlet被标记为永久不可用，卸载它并释放这个实例
                     wrapper.unload();
                 }
             } catch (Throwable e) {

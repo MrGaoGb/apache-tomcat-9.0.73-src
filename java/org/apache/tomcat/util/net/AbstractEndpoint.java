@@ -1249,19 +1249,23 @@ public abstract class AbstractEndpoint<S,U> {
             if (socketWrapper == null) {
                 return false;
             }
+            // 包装SocketChannel SocketProcessor 放入执行器中调用
             SocketProcessorBase<S> sc = null;
             if (processorCache != null) {
                 sc = processorCache.pop();
             }
             if (sc == null) {
+                // new SocketProcessor(socketWrapper, event) 同时实现了Runnable接口
                 sc = createSocketProcessor(socketWrapper, event);
             } else {
                 sc.reset(socketWrapper, event);
             }
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
+                // 当线程池不为空时 放入线程池中启动sc线程
                 executor.execute(sc);
             } else {
+                // 直接启动线程
                 sc.run();
             }
         } catch (RejectedExecutionException ree) {
@@ -1274,6 +1278,7 @@ public abstract class AbstractEndpoint<S,U> {
             getLog().error(sm.getString("endpoint.process.fail"), t);
             return false;
         }
+        // 当线程SocketProcessor启动完成后 返回true，表示Socket处理完成!!!
         return true;
     }
 

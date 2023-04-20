@@ -158,7 +158,7 @@ public final class ApplicationFilterChain implements FilterChain {
             throws IOException, ServletException {
 
         // Call the next filter if there is one
-        // 循环遍历Filter过滤器
+        // TODO 循环遍历执行Filter过滤器
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
             try {
@@ -189,7 +189,7 @@ public final class ApplicationFilterChain implements FilterChain {
         }
 
         // We fell off the end of the chain -- call the servlet instance
-        // 此处开始分发处理真实请求
+        // TODO 此处开始分发处理真实请求
         try {
             if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(request);
@@ -199,6 +199,7 @@ public final class ApplicationFilterChain implements FilterChain {
             if (request.isAsyncSupported() && !servletSupportsAsync) {
                 request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
             }
+            // TODO 以下逻辑主要为：执行Servlet的service方法
             // Use potentially wrapped request from this point
             if ((request instanceof HttpServletRequest) && (response instanceof HttpServletResponse) &&
                     Globals.IS_SECURITY_ENABLED) {
@@ -208,6 +209,7 @@ public final class ApplicationFilterChain implements FilterChain {
                 Object[] args = new Object[] { req, res };
                 SecurityUtil.doAsPrivilege("service", servlet, classTypeUsedInService, args, principal);
             } else {
+                // 调用Servlet的service方法
                 servlet.service(request, response);
             }
         } catch (IOException | ServletException | RuntimeException e) {

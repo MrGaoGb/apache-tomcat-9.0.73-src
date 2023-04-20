@@ -257,7 +257,7 @@ public class Http11Processor extends AbstractProcessor {
         while (!getErrorState().isError() && keepAlive && !isAsync() && upgradeToken == null &&
                 sendfileState == SendfileState.DONE && !protocol.isPaused()) {
 
-            // Parsing the request header
+            // Parsing the request header（解析请求头 读取SocketChannel数据）
             try {
                 if (!inputBuffer.parseRequestLine(keptAlive, protocol.getConnectionTimeout(),
                         protocol.getKeepAliveTimeout())) {
@@ -363,6 +363,7 @@ public class Http11Processor extends AbstractProcessor {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
+                    // 设置过滤器、校验请求头Header
                     prepareRequest();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -382,11 +383,11 @@ public class Http11Processor extends AbstractProcessor {
                 keepAlive = false;
             }
 
-            // Process the request in the adapter
+            // Process the request in the adapter(在适配器中处理请求)
             if (getErrorState().isIoAllowed()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    // 主要执行方法入口
+                    // 主要执行方法入口 调用CoyoteAdapter的service方法
                     getAdapter().service(request, response);
                     // Handle when the response was committed before a serious
                     // error occurred. Throwing a ServletException should both
@@ -621,6 +622,7 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * After reading the request headers, we have to setup the request filters.
+     * (读取请求标头后，我们必须设置请求过滤器)
      */
     private void prepareRequest() throws IOException {
 

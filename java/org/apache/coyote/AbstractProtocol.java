@@ -91,6 +91,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     public AbstractProtocol(AbstractEndpoint<S, ?> endpoint) {
         this.endpoint = endpoint;
+        // 创建默认执行器Handler 后面要用
         ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
         getEndpoint().setHandler(cHandler);
         setHandler(cHandler);
@@ -659,7 +660,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             getLog().info(sm.getString("abstractProtocolHandler.start", getName()));
             logPortOffset();
         }
-
+        // 调用NioEndpoint的start方法
         endpoint.start();
         monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(() -> {
             startAsyncTimeout();
@@ -837,13 +838,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
             }
-
+            // 获取Socket套接字
             S socket = wrapper.getSocket();
 
             // We take complete ownership of the Processor inside of this method to ensure
             // no other thread can release it while we're using it. Whatever processor is
             // held by this variable will be associated with the SocketWrapper before this
             // method returns.
+            //
             Processor processor = (Processor) wrapper.takeCurrentProcessor();
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("abstractConnectionHandler.connectionsGet", processor, socket));
@@ -860,7 +862,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             }
 
             if (processor != null) {
-                // Make sure an async timeout doesn't fire
+                // Make sure an async timeout doesn't fire(确保异步超时不会触发)
                 getProtocol().removeWaitingProcessor(processor);
             } else if (status == SocketEvent.DISCONNECT || status == SocketEvent.ERROR) {
                 // Nothing to do. Endpoint requested a close and there is no
@@ -905,12 +907,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                     }
                 }
                 if (processor == null) {
+                    // 如果为空 则recycledProcessors获取
                     processor = recycledProcessors.pop();
                     if (getLog().isDebugEnabled()) {
                         getLog().debug(sm.getString("abstractConnectionHandler.processorPop", processor));
                     }
                 }
                 if (processor == null) {
+                    // 如果仍为空 则创建一个processor（Http11Processor）
                     processor = getProtocol().createProcessor();
                     register(processor);
                     if (getLog().isDebugEnabled()) {
@@ -923,6 +927,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
                 SocketState state = SocketState.CLOSED;
                 do {
+                    // Http11Processor.AbstractProcessorLight.process()
                     state = processor.process(wrapper, status);
 
                     if (state == SocketState.UPGRADING) {

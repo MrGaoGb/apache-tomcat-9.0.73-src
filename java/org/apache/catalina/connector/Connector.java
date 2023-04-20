@@ -1035,6 +1035,7 @@ public class Connector extends LifecycleMBeanBase {
         setState(LifecycleState.STARTING);
 
         try {
+            // 调用Http11NioProtocol的start()方法
             protocolHandler.start();
         } catch (Exception e) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerStartFailed"), e);

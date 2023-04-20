@@ -784,6 +784,7 @@ public final class Mapper {
             return;
         }
 
+        // 设置请求上下文
         mappingData.contextPath.setString(context.name);
 
         ContextVersion contextVersion = null;
