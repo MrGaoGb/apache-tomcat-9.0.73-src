@@ -822,6 +822,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     @Override
     protected void initInternal() throws LifecycleException {
+        // 配置StopExecutor 1个线程
         reconfigureStartStopExecutor(getStartStopThreads());
         super.initInternal();
     }
@@ -866,7 +867,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         // Start our child containers, if any
-        // StandardHost ，父级 StandardEngine
+        // StandardHost ，父级 StandardEngine 获取子级 子级在digester解析的时候会注入下级
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
@@ -877,6 +878,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
         MultiThrowable multiThrowable = null;
 
+        // 由于StartChild实现了Callable接口 results不为空时 需要阻塞调用等待执行结果
         for (Future<Void> result : results) {
             try {
                 result.get();
@@ -889,14 +891,18 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             }
 
         }
+
+        // 此处multiThrowable为空 表示子节点全部执行成功! 否则抛出LifecycleException
         if (multiThrowable != null) {
             throw new LifecycleException(sm.getString("containerBase.threadedStartFailed"),
                     multiThrowable.getThrowable());
         }
 
         // Start the Valves in our pipeline (including the basic), if any
+        // pipeline = new StandardPipeline(this)
         if (pipeline instanceof Lifecycle) {
-            ((Lifecycle) pipeline).start();// 调用StandardPipeline的start方法
+            // 调用StandardPipeline的start方法
+            ((Lifecycle) pipeline).start();
         }
 
         setState(LifecycleState.STARTING);

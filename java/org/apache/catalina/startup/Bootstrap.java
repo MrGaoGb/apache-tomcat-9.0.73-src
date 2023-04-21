@@ -251,10 +251,13 @@ public final class Bootstrap {
      */
     public void init() throws Exception {
         // 创建ClassLoader对象
+        // 加载server.xml中的(common.loader || server.loader || shared.loader
         initClassLoaders();
 
+        // 为当前线程设置classLoader对象
         Thread.currentThread().setContextClassLoader(catalinaLoader);
 
+        // 将必要的类进行加载处理
         SecurityClassLoad.securityClassLoad(catalinaLoader);
 
         // Load our startup class and call its process() method
@@ -272,13 +275,17 @@ public final class Bootstrap {
         if (log.isDebugEnabled()) {
             log.debug("Setting startup class properties");
         }
+
+        // 以下方法：执行Catalina的setParentClassLoader方法，设置parent类加载器
         String methodName = "setParentClassLoader";
         Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
         Object paramValues[] = new Object[1];
         paramValues[0] = sharedLoader;
+        // 从class中获取对应method
         Method method =
             startupInstance.getClass().getMethod(methodName, paramTypes);
+        // 执行method(即就是执行setParentClassLoader方法)
         method.invoke(startupInstance, paramValues);
 
         catalinaDaemon = startupInstance;
@@ -448,6 +455,10 @@ public final class Bootstrap {
                 // Don't set daemon until init() has completed
                 Bootstrap bootstrap = new Bootstrap();
                 try {
+                    /**
+                     * 1、初始化类加载器
+                     * 2、创建Catalina对象，并设置Catalina的父类加载器
+                     */
                     bootstrap.init();
                 } catch (Throwable t) {
                     handleThrowable(t);
@@ -465,6 +476,7 @@ public final class Bootstrap {
 
         // 通过命令启动Tomcat start stop
         try {
+            // 启动命令start
             String command = "start";
             if (args.length > 0) {
                 command = args[args.length - 1];
@@ -478,6 +490,7 @@ public final class Bootstrap {
                 args[args.length - 1] = "stop";
                 daemon.stop();
             } else if (command.equals("start")) {
+                // 执行Catalina的setAwait方法
                 daemon.setAwait(true);
                 // 执行Catalina的load方法
                 daemon.load(args);

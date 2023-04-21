@@ -981,9 +981,11 @@ public class Connector extends LifecycleMBeanBase {
         }
 
         // Initialize adapter 适配器
+        // 创建适配器CoyoteAdapter对象 并设置到Http11NioProtocol中(便于后面用)
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
         if (service != null) {
+            // standardService不为空时 设置线程池UtilityExecutor
             protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
         }
 
@@ -993,10 +995,12 @@ public class Connector extends LifecycleMBeanBase {
         }
 
         if (protocolHandler.isAprRequired() && !AprStatus.isInstanceCreated()) {
+            // 抛出Exception
             throw new LifecycleException(
                     sm.getString("coyoteConnector.protocolHandlerNoAprListener", getProtocolHandlerClassName()));
         }
         if (protocolHandler.isAprRequired() && !AprStatus.isAprAvailable()) {
+            // 抛出Exception
             throw new LifecycleException(
                     sm.getString("coyoteConnector.protocolHandlerNoAprLibrary", getProtocolHandlerClassName()));
         }
@@ -1010,6 +1014,7 @@ public class Connector extends LifecycleMBeanBase {
         }
 
         try {
+            // 调用Http11NioProtocol的init方法
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerInitializationFailed"), e);

@@ -909,6 +909,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_START_EVENT, null);
         setState(LifecycleState.STARTING);
 
+        // 启动全局NamingResources
         globalNamingResources.start();
 
         // Start our defined Services
@@ -986,7 +987,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         super.initInternal();
 
         // Initialize utility executor
+        // 初始化线程池UtilityExecutor 默认初始化2个核心线程 最大工作线程为Integer.MAX_VALUE
         reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+        // 线程池UtilityExecutor
         register(utilityExecutor, "type=UtilityExecutor");
 
         // Register global String cache
@@ -997,6 +1000,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         // Register the MBeanFactory
         MBeanFactory factory = new MBeanFactory();
+        // 将StandardServer设置到Factory中
         factory.setContainer(this);
         onameMBeanFactory = register(factory, "type=MBeanFactory");
 
@@ -1006,6 +1010,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Populate the extension validator with JARs from common and shared
         // class loaders
         if (getCatalina() != null) {
+            // 获取Catalina的父类加载器
             ClassLoader cl = getCatalina().getParentClassLoader();
             // Walk the class loader hierarchy. Stop at the system class loader.
             // This will add the shared (if present) and common class loaders

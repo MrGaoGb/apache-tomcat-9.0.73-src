@@ -530,7 +530,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         super.initInternal();
 
         if (engine != null) {
-            engine.init();// StandardEngine
+            // StandardEngine
+            // StandardEngine不为空时 调用StandardEngine的init方法
+            // 配置reconfigureStartStopExecutor线程池（1个线程）
+            engine.init();
         }
 
         // Initialize any Executors

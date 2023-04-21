@@ -436,6 +436,7 @@ public class Catalina {
                          new ConnectorCreateRule());
         digester.addSetProperties("Server/Service/Connector",
                 new String[]{"executor", "sslImplementationName", "protocol"});
+        // 执行Service.addConnector方法
         digester.addSetNext("Server/Service/Connector",
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
@@ -556,6 +557,7 @@ public class Catalina {
 
         if (useGeneratedCode && !Digester.isGeneratedCodeLoaderSet()) {
             // Load loader
+            // loaderClassName = catalinaembedded.DigesterGeneratedCodeLoader
             String loaderClassName = generatedCodePackage + ".DigesterGeneratedCodeLoader";
             try {
                 Digester.GeneratedCodeLoader loader = (Digester.GeneratedCodeLoader)
@@ -606,6 +608,7 @@ public class Catalina {
             try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
                 // Create and execute our Digester
                 // 通过digester来解析 server.xml 文件
+                // start==true
                 Digester digester = start ? createStartDigester() : createStopDigester();
                 InputStream inputStream = resource.getInputStream();
                 InputSource inputSource = new InputSource(resource.getURI().toURL().toString());
@@ -615,6 +618,7 @@ public class Catalina {
                     digester.startGeneratingCode();
                     generateClassHeader(digester, start);
                 }
+                // 真正的进行xml解析逻辑
                 digester.parse(inputSource);
                 if (generateCode) {
                     generateClassFooter(digester);
