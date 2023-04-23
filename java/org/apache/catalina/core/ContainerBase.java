@@ -905,6 +905,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             ((Lifecycle) pipeline).start();
         }
 
+        // TODO 需要关注下
         setState(LifecycleState.STARTING);
 
         // Start our thread

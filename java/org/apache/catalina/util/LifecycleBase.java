@@ -418,7 +418,7 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         this.state = state;
-        String lifecycleEvent = state.getLifecycleEvent();
+        String lifecycleEvent = state.getLifecycleEvent();// lifecycleEvent处理
         if (lifecycleEvent != null) {
             fireLifecycleEvent(lifecycleEvent, data);
         }

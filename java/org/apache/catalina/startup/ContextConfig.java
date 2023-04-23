@@ -771,7 +771,7 @@ public class ContextConfig implements LifecycleListener {
      * @throws IOException cannot access the context base path
      */
     protected void fixDocBase() throws IOException {
-
+        // context的父级Container为StandardHost
         Host host = (Host) context.getParent();
         File appBase = host.getAppBaseFile();
 
