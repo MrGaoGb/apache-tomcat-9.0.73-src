@@ -98,16 +98,17 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
         if (engine == null) {
             return;
         }
-
+        // 获取默认的Host节点
         findDefaultHost();
-
+        // 将StandardEngine节点添加至Listener中
         addListeners(engine);
-
+        //
         Container[] conHosts = engine.findChildren();
         for (Container conHost : conHosts) {
             Host host = (Host) conHost;
             if (!LifecycleState.NEW.equals(host.getState())) {
                 // Registering the host will register the context and wrappers
+                // 注册Host、Context以及wrappers属性
                 registerHost(host);
             }
         }
@@ -253,7 +254,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
     // ------------------------------------------------------ Protected Methods
 
     private void findDefaultHost() {
-
+        // 获取的
         Engine engine = service.getContainer();
         String defaultHost = engine.getDefaultHost();
 
@@ -297,6 +298,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
 
         for (Container container : host.findChildren()) {
             if (container.getState().isAvailable()) {
+                // 注册Context和wrappers属性
                 registerContext((Context) container);
             }
         }
@@ -490,6 +492,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
      * @param container the container (and any associated children) to which the mapper is to be added
      */
     private void addListeners(Container container) {
+        // 以递归执行的方式 依次查询子节点
         container.addContainerListener(this);
         container.addLifecycleListener(this);
         for (Container child : container.findChildren()) {

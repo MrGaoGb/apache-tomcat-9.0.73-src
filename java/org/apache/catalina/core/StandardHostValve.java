@@ -127,6 +127,7 @@ final class StandardHostValve extends ValveBase {
             // application for processing.
             try {
                 if (!response.isErrorReportRequired()) {
+                    // StandardContext.StandardPipeline.StandardContextValve.invoke
                     context.getPipeline().getFirst().invoke(request, response);
                 }
             } catch (Throwable t) {

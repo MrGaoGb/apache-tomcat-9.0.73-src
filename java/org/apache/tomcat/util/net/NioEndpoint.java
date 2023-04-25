@@ -309,6 +309,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
             // Create worker collection
             if (getExecutor() == null) {
+                // 如果线程池为空,则创建一个核心线程10，最大线程200的线程池，队列采用taskQueue
                 createExecutor();
             }
 
@@ -495,21 +496,24 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (isSSLEnabled()) {
                     channel = new SecureNioChannel(bufhandler, this);
                 } else {
+                    // 默认创建NioChannel
                     channel = new NioChannel(bufhandler);
                 }
             }
-            NioSocketWrapper newWrapper = new NioSocketWrapper(channel, this);//将NioChannel转化为NioSocketWrapper
+            //将NioChannel转化为NioSocketWrapper
+            NioSocketWrapper newWrapper = new NioSocketWrapper(channel, this);
             channel.reset(socket, newWrapper);
             connections.put(socket, newWrapper);
             socketWrapper = newWrapper;
 
             // Set socket properties
             // Disable blocking, polling will be used
+            // 将SocketChannel设置为非阻塞
             socket.configureBlocking(false);
             if (getUnixDomainSocketPath() == null) {
                 socketProperties.setProperties(socket.socket());
             }
-
+            // 设置socketWrapper的读和写超时时间
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
@@ -712,6 +716,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             boolean result = false;
 
             PollerEvent pe = null;
+            // events.poll() 获取一个PollerEvent
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
                 NioSocketWrapper socketWrapper = pe.getSocketWrapper();
@@ -1807,7 +1812,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (handshake == 0) {
                     SocketState state = SocketState.OPEN;
                     // Process the request from this socket(===处理来自这个套接字的请求)
-                    // getHandler() === ConnectionHandler
+                    // getHandler() === ConnectionHandler(通过AbstractProtocol构造方法实例化的)
                     if (event == null) {
                         state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
                     } else {
